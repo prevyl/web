@@ -12,7 +12,12 @@
   --bg-hover: #1c1a17;
   --text-primary: #f5f5f5;
   --text-secondary: #a09888;
-  --text-muted: #787068;
+  /* Prompt token was #787068 (verbatim from aryanbv.com), which hits only
+     4.07:1 on #0a0a0a — below WCAG AA 4.5:1 for small text (all our uses
+     of this token are 10–13px). Lightened to #887c6e (~4.83:1) to clear AA
+     without losing the warm-taupe character. Single deliberate divergence
+     from aryanbv.com tokens, flagged to Aryan. */
+  --text-muted: #887c6e;
   --accent: #f5a623;
   --accent-2: #ff6b35;
   --accent-dim: #f5a6231f;
