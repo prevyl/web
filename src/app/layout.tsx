@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Prevyl — Aryan B V",
   description:
     "Prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+  icons: {
+    icon: [{ url: "/assets/prevyl-monogram-dark.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: "Prevyl — Aryan B V",
     description:

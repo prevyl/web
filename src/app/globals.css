@@ -70,3 +70,183 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ── Component primitives (btn-xl, pill, card, eyebrow) ───────────── */
+@layer components {
+  .btn-xl {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      transform 250ms var(--ease-emph),
+      box-shadow 250ms var(--ease-emph),
+      border-color 250ms var(--ease-emph),
+      color 250ms var(--ease-emph);
+  }
+  .btn-xl.primary {
+    background: var(--accent);
+    color: var(--bg-base);
+  }
+  .btn-xl.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px #f5a62347;
+  }
+  .btn-xl.ghost {
+    background: transparent;
+    color: var(--text-primary);
+    border-color: var(--border);
+  }
+  .btn-xl.ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .eyebrow .num {
+    color: var(--text-muted);
+    opacity: 0.75;
+  }
+
+  .availability-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .availability-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--status-live);
+    box-shadow: 0 0 8px var(--status-live);
+    animation: availability-pulse 2s ease-in-out infinite;
+  }
+  @keyframes availability-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 999px;
+    transition:
+      color 200ms var(--ease-emph),
+      background-color 200ms var(--ease-emph);
+  }
+  .nav-pill:hover {
+    color: var(--text-primary);
+    background: var(--accent-dim);
+  }
+  .nav-pill .num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .nav-pill:hover .num {
+    color: var(--accent);
+  }
+
+  .contact-card {
+    display: block;
+    padding: 22px 24px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text-primary);
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 250ms var(--ease-emph),
+      box-shadow 250ms var(--ease-emph);
+  }
+  .contact-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .contact-card .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .contact-card .value {
+    display: block;
+    font-size: 16px;
+    color: var(--text-primary);
+    font-feature-settings: "ss01";
+  }
+
+  .location-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .text-link {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--border-hover);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition:
+      color 200ms var(--ease-emph),
+      text-decoration-color 200ms var(--ease-emph);
+  }
+  .text-link:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+}
+
+/* ── Mobile-specific collapses ────────────────────────────────────── */
+@media (max-width: 640px) {
+  .header-nav { display: none !important; }
+  .contact-grid { grid-template-columns: 1fr !important; }
+  .hero-cta-group { flex-direction: column !important; align-items: stretch !important; }
+  .hero-cta-group .btn-xl { width: 100%; }
+}
+@media (max-width: 480px) {
+  .header-sublabel { display: none !important; }
+}

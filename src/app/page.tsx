@@ -1,9 +1,15 @@
+import { About, Contact, Footer, Header, Hero } from "./_components";
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <p style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-        Prevyl — scaffold online.
-      </p>
-    </main>
+    <>
+      <Header />
+      <main>
+        <Hero />
+        <About />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 }
