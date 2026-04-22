@@ -110,15 +110,21 @@ export function Hero() {
     <section
       id="top"
       style={{
+        position: "relative",
         minHeight: "90svh",
         display: "flex",
         alignItems: "center",
         paddingTop: "max(7rem, 14vh)",
         paddingBottom: "clamp(2rem, 8vh, 6rem)",
+        overflow: "hidden",
       }}
     >
+      <div aria-hidden="true" className="hero-wash" />
+      <div aria-hidden="true" className="hero-wash hero-wash--2" />
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           width: "100%",
           maxWidth: 720,
           margin: "0 auto",

@@ -45,12 +45,69 @@ body {
   color: var(--text-primary);
   font-family: var(--font-display);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+/* Noise grain texture — signature warmth for dark surfaces.
+   3.5% opacity fractal noise tiled at 128px, fixed so it doesn't scroll. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* Ambient amber grid backdrop — 80px grid fading toward bottom via radial
+   mask, so only the hero area has grid texture. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 90%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 90%);
+}
+
+/* Page content stacks above the noise + grid pseudo layers. */
+header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
   background: var(--accent);
   color: var(--bg-base);
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb {
+  background: var(--divider);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -224,19 +281,68 @@ body {
     color: var(--text-secondary);
   }
 
+  /* Magnetic link — underline sweeps right-to-left on hover, arrow nudges
+     up-right if followed by an .arrow element. Mirrors portfolio pattern. */
   .text-link {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
     color: var(--text-primary);
-    text-decoration: underline;
-    text-decoration-color: var(--border-hover);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
+    text-decoration: none;
+    transition: color 250ms var(--ease-emph);
+  }
+  .text-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1px;
+    background: currentColor;
+    transform-origin: right;
+    transform: scaleX(1);
+    opacity: 0.35;
     transition:
-      color 200ms var(--ease-emph),
-      text-decoration-color 200ms var(--ease-emph);
+      transform 350ms var(--ease-emph),
+      opacity 250ms var(--ease-emph),
+      background 250ms var(--ease-emph);
   }
   .text-link:hover {
     color: var(--accent);
-    text-decoration-color: var(--accent);
+  }
+  .text-link:hover::after {
+    opacity: 1;
+  }
+
+  /* Subtle hero backdrop — single amber radial wash, masked to the hero
+     area only. Static, no animation. */
+  .hero-wash {
+    position: absolute;
+    top: -20%;
+    left: -12%;
+    width: 60%;
+    aspect-ratio: 1;
+    background: radial-gradient(
+      circle at center,
+      rgba(245, 166, 35, 0.10),
+      transparent 60%
+    );
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(24px);
+  }
+  .hero-wash--2 {
+    top: auto;
+    left: auto;
+    right: -8%;
+    bottom: -10%;
+    width: 45%;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 107, 53, 0.07),
+      transparent 60%
+    );
+    filter: blur(40px);
   }
 }
 
