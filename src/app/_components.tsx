@@ -429,33 +429,16 @@ export function SectionDivider() {
 export function Footer() {
   return (
     <footer style={{ padding: "56px 24px 40px", textAlign: "center" }}>
-      <div
+      <p
         style={{
-          display: "inline-flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 16,
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          letterSpacing: "0.15em",
+          color: "var(--text-muted)",
         }}
       >
-        <Image
-          src="/assets/prevyl-monogram-dark.svg"
-          alt=""
-          width={24}
-          height={24}
-          aria-hidden="true"
-          style={{ opacity: 0.6 }}
-        />
-        <p
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            color: "var(--text-muted)",
-          }}
-        >
-          prevyl · Built by Aryan B V · Last updated April 2026
-        </p>
-      </div>
+        prevyl · Built by Aryan B V · Last updated April 2026
+      </p>
     </footer>
   );
 }
