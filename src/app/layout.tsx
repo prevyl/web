@@ -37,16 +37,16 @@ export const metadata: Metadata = {
       "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
     url: "https://prevyl.com/",
     siteName: "prevyl",
-    images: ["/og.png"],
     locale: "en_IN",
     type: "website",
+    // No explicit images — Next.js auto-links src/app/opengraph-image.tsx
+    // for og:image and reuses it for twitter:image.
   },
   twitter: {
     card: "summary_large_image",
     title: "prevyl — Aryan B V",
     description:
       "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
-    images: ["/og.png"],
   },
 };
 
