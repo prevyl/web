@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   title: "prevyl — Aryan B V",
   description:
     "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+  alternates: {
+    canonical: "https://prevyl.com/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
       {
@@ -28,9 +35,41 @@ export const metadata: Metadata = {
     title: "prevyl — Aryan B V",
     description:
       "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+    url: "https://prevyl.com/",
+    siteName: "prevyl",
     images: ["/og.png"],
+    locale: "en_IN",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "prevyl — Aryan B V",
+    description:
+      "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+    images: ["/og.png"],
+  },
+};
+
+// Person JSON-LD — binds prevyl.com ↔ aryanbv.com ↔ LinkedIn as the same
+// entity in Google's Knowledge Graph. For a credibility site this is the
+// single highest-leverage SEO signal: "yes, the Aryan B V behind prevyl
+// is the same Aryan B V behind aryanbv.com."
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Aryan B V",
+  url: "https://prevyl.com/",
+  image: "https://prevyl.com/og.png",
+  jobTitle: "Founder",
+  worksFor: {
+    "@type": "Organization",
+    name: "prevyl",
+    url: "https://prevyl.com/",
+  },
+  sameAs: [
+    "https://aryanbv.com",
+    "https://www.linkedin.com/in/aryanbv/",
+  ],
 };
 
 export default function RootLayout({
@@ -43,6 +82,12 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         {children}
         <Analytics />
+        {/* Structured data — safe because personJsonLd is a static object
+            literal under our control (no user input, no external data). */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
       </body>
     </html>
   );

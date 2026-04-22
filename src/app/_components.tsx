@@ -79,13 +79,15 @@ export function Header() {
           {/* Wordmark SVG is the full brand mark — lowercase prevyl with
               amber y. No accompanying monogram; the wordmark carries the
               name on its own. */}
+          {/* Wordmark SVG is 3.25:1 (viewBox 260×80). Declared at the
+              rendered aspect so Next.js reserves the exact space and
+              there's no CLS. */}
           <Image
             src="/assets/prevyl-wordmark-dark.svg"
             alt="prevyl"
-            width={84}
-            height={26}
+            width={78}
+            height={24}
             priority
-            style={{ display: "block", height: 24, width: "auto" }}
           />
           <span
             className="header-sublabel"
@@ -194,7 +196,7 @@ export function Hero() {
             color: "var(--text-primary)",
           }}
         >
-          prevyl is a research
+          prev<span style={{ color: "var(--accent)" }}>y</span>l is a research
           <br />
           project, <em style={{ color: "var(--text-primary)" }}>not</em> a product.
         </motion.h1>
@@ -306,7 +308,7 @@ export function About() {
               href="https://aryanbv.com/projects/ajsp-manager"
               className="text-link"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               AJSP Manager
             </a>{" "}
@@ -315,7 +317,7 @@ export function About() {
               href="https://aryanbv.com"
               className="text-link"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               aryanbv.com
             </a>
@@ -385,7 +387,7 @@ export function Contact() {
             className="contact-row"
             role="listitem"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <span className="icon" aria-hidden="true">
               <LinkedInIcon />
