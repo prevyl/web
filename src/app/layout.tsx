@@ -6,9 +6,9 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://prevyl.com"),
-  title: "Prevyl — Aryan B V",
+  title: "prevyl — Aryan B V",
   description:
-    "Prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+    "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
   icons: {
     icon: [
       {
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     apple: { url: "/assets/prevyl-monogram-light.svg" },
   },
   openGraph: {
-    title: "Prevyl — Aryan B V",
+    title: "prevyl — Aryan B V",
     description:
-      "Prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
+      "prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
     images: ["/og.png"],
     type: "website",
   },

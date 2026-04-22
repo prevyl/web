@@ -65,76 +65,39 @@ export function Header() {
       >
         <a
           href="#top"
-          aria-label="Prevyl — top"
+          aria-label="prevyl — top"
           style={{
             display: "inline-flex",
-            alignItems: "center",
-            gap: 12,
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: 4,
+            lineHeight: 1,
             textDecoration: "none",
             color: "var(--text-primary)",
           }}
         >
+          {/* Wordmark SVG is the full brand mark — lowercase prevyl with
+              amber y. No accompanying monogram; the wordmark carries the
+              name on its own. */}
+          <Image
+            src="/assets/prevyl-wordmark-dark.svg"
+            alt="prevyl"
+            width={84}
+            height={26}
+            priority
+            style={{ display: "block", height: 24, width: "auto" }}
+          />
           <span
+            className="header-sublabel"
             style={{
-              position: "relative",
-              display: "inline-flex",
-              width: 32,
-              height: 32,
-              alignItems: "center",
-              justifyContent: "center",
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              letterSpacing: "0.2em",
+              color: "var(--text-muted)",
+              paddingLeft: 2,
             }}
           >
-            <span
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "var(--accent)",
-                borderRadius: 6,
-                opacity: 0.12,
-                filter: "blur(10px)",
-              }}
-            />
-            <Image
-              src="/assets/prevyl-monogram-dark.svg"
-              alt=""
-              width={28}
-              height={28}
-              priority
-              style={{ position: "relative" }}
-            />
-          </span>
-          <span
-            style={{
-              display: "inline-flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              lineHeight: 1,
-              gap: 4,
-            }}
-          >
-            {/* Wordmark SVG (lowercase prevyl, amber y) — the unique
-                Prevyl identity moment, deliberately different from the
-                portfolio's typed header. */}
-            <Image
-              src="/assets/prevyl-wordmark-dark.svg"
-              alt="Prevyl"
-              width={78}
-              height={24}
-              priority
-              style={{ display: "block", height: 20, width: "auto" }}
-            />
-            <span
-              className="header-sublabel"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                letterSpacing: "0.2em",
-                color: "var(--text-muted)",
-              }}
-            >
-              RESEARCH · BLR
-            </span>
+            RESEARCH · BLR
           </span>
         </a>
 
@@ -231,7 +194,7 @@ export function Hero() {
             color: "var(--text-primary)",
           }}
         >
-          Prevyl is a research
+          prevyl is a research
           <br />
           project, <em style={{ color: "var(--text-primary)" }}>not</em> a product.
         </motion.h1>
@@ -338,7 +301,7 @@ export function About() {
             I&apos;m Aryan B V. Full-stack engineer, B.Tech in AI/ML from Ramaiah University of Applied Sciences (2021–25). Based in Bangalore.
           </p>
           <p>
-            Before Prevyl, I built{" "}
+            Before prevyl, I built{" "}
             <a
               href="https://aryanbv.com/projects/ajsp-manager"
               className="text-link"
@@ -359,7 +322,7 @@ export function About() {
             .
           </p>
           <p>
-            Prevyl is my current focus. I&apos;m in the research phase — interviewing Indian SME exporters to understand their real workflow. No product yet. That comes after the interviews tell me what to build.
+            prevyl is my current focus. I&apos;m in the research phase — interviewing Indian SME exporters to understand their real workflow. No product yet. That comes after the interviews tell me what to build.
           </p>
         </div>
       </RevealBlock>
@@ -490,7 +453,7 @@ export function Footer() {
             color: "var(--text-muted)",
           }}
         >
-          Prevyl · Built by Aryan B V · Last updated April 2026
+          prevyl · Built by Aryan B V · Last updated April 2026
         </p>
       </div>
     </footer>
