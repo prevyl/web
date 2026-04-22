@@ -50,6 +50,14 @@ export function Header() {
         left: 0,
         right: 0,
         zIndex: 50,
+        // Frosted-glass bar — at page-top the bg matches body so the
+        // header looks transparent; as content scrolls under, the alpha
+        // + backdrop-blur creates a legible separation without a hard
+        // line. Matches the Apple/Stripe/Linear header idiom.
+        background: "rgba(10, 10, 10, 0.72)",
+        backdropFilter: "blur(16px) saturate(180%)",
+        WebkitBackdropFilter: "blur(16px) saturate(180%)",
+        borderBottom: "1px solid var(--divider)",
       }}
     >
       <div
