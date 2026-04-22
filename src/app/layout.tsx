@@ -10,7 +10,19 @@ export const metadata: Metadata = {
   description:
     "Prevyl is a research project by Aryan B V, talking to Indian SME exporters in Bangalore.",
   icons: {
-    icon: [{ url: "/assets/prevyl-monogram-dark.svg", type: "image/svg+xml" }],
+    icon: [
+      {
+        url: "/assets/prevyl-monogram-dark.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        url: "/assets/prevyl-monogram-light.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: light)",
+      },
+    ],
+    apple: { url: "/assets/prevyl-monogram-light.svg" },
   },
   openGraph: {
     title: "Prevyl — Aryan B V",

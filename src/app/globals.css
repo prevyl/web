@@ -60,37 +60,22 @@ video {
   max-width: 100%;
 }
 
-/* Noise grain texture — signature warmth for dark surfaces.
-   3.5% opacity fractal noise tiled at 128px, fixed so it doesn't scroll. */
+/* Near-invisible paper grain — 1% opacity, just enough to take the
+   digital flatness off the dark surface without recalling the portfolio's
+   heavier texture layer. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.01;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 128px 128px;
 }
 
-/* Ambient amber grid backdrop — 80px grid fading toward bottom via radial
-   mask, so only the hero area has grid texture. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 80px 80px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 90%);
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 90%);
-}
-
-/* Page content stacks above the noise + grid pseudo layers. */
+/* Page content stacks above the grain layer. */
 header,
 main,
 footer {
@@ -163,8 +148,7 @@ footer {
     color: var(--bg-base);
   }
   .btn-xl.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px #f5a62347;
+    background: #ffb431;
   }
   .btn-xl.ghost {
     background: transparent;
@@ -172,8 +156,9 @@ footer {
     border-color: var(--border);
   }
   .btn-xl.ghost:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+    background: var(--bg-surface);
   }
 
   .eyebrow {
@@ -191,27 +176,30 @@ footer {
     opacity: 0.75;
   }
 
+  /* Editorial dateline — thin rule on the left, steady dot (no pulse),
+     mono meta text. Signals "dispatch from" rather than "live status." */
   .availability-pill {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
+  .availability-pill::before {
+    content: "";
+    width: 32px;
+    height: 1px;
+    background: var(--text-muted);
+    opacity: 0.5;
+  }
   .availability-pill .dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: var(--status-live);
-    box-shadow: 0 0 8px var(--status-live);
-    animation: availability-pulse 2s ease-in-out infinite;
-  }
-  @keyframes availability-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
   }
 
   .nav-pill {
@@ -240,37 +228,50 @@ footer {
     color: var(--accent);
   }
 
-  .contact-card {
-    display: block;
-    padding: 22px 24px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+  /* Contact row — editorial list entry with icon, label, value, arrow.
+     Deliberately NOT a card (Prevyl is a dispatch, not a product page). */
+  .contact-row {
+    display: grid;
+    grid-template-columns: 18px 90px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 4px;
+    border-bottom: 1px solid var(--divider);
     color: var(--text-primary);
     text-decoration: none;
-    box-shadow: var(--shadow-card);
-    transition:
-      border-color 250ms var(--ease-emph),
-      box-shadow 250ms var(--ease-emph);
+    transition: color 250ms var(--ease-emph), border-color 250ms var(--ease-emph);
   }
-  .contact-card:hover {
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-card-hover);
+  .contact-row:hover {
+    color: var(--accent);
+    border-bottom-color: var(--border-hover);
   }
-  .contact-card .label {
-    display: block;
+  .contact-row .icon {
+    display: inline-flex;
+    color: var(--text-muted);
+    transition: color 250ms var(--ease-emph);
+  }
+  .contact-row:hover .icon {
+    color: var(--accent);
+  }
+  .contact-row .label {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 8px;
   }
-  .contact-card .value {
-    display: block;
-    font-size: 16px;
-    color: var(--text-primary);
-    font-feature-settings: "ss01";
+  .contact-row .value {
+    font-size: 17px;
+    color: inherit;
+  }
+  .contact-row .arrow {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    transition: transform 250ms var(--ease-emph), color 250ms var(--ease-emph);
+  }
+  .contact-row:hover .arrow {
+    color: var(--accent);
+    transform: translate(4px, -2px);
   }
 
   .location-pill {
@@ -319,44 +320,28 @@ footer {
     opacity: 1;
   }
 
-  /* Subtle hero backdrop — single amber radial wash, masked to the hero
-     area only. Static, no animation. */
-  .hero-wash {
-    position: absolute;
-    top: -20%;
-    left: -12%;
-    width: 60%;
-    aspect-ratio: 1;
-    background: radial-gradient(
-      circle at center,
-      rgba(245, 166, 35, 0.10),
-      transparent 60%
-    );
-    pointer-events: none;
-    z-index: 0;
-    filter: blur(24px);
-  }
-  .hero-wash--2 {
-    top: auto;
-    left: auto;
-    right: -8%;
-    bottom: -10%;
-    width: 45%;
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 107, 53, 0.07),
-      transparent 60%
-    );
-    filter: blur(40px);
+  /* Section divider — a single hairline rule, offset slightly from the
+     content width so it reads as structural instead of decorative. */
+  .section-divider {
+    height: 1px;
+    background: var(--divider);
+    max-width: 720px;
+    margin: 0 auto;
   }
 }
 
 /* ── Mobile-specific collapses ────────────────────────────────────── */
 @media (max-width: 640px) {
   .header-nav { display: none !important; }
-  .contact-grid { grid-template-columns: 1fr !important; }
   .hero-cta-group { flex-direction: column !important; align-items: stretch !important; }
   .hero-cta-group .btn-xl { width: 100%; }
+  .contact-row {
+    grid-template-columns: 16px 72px 1fr auto;
+    gap: 12px;
+  }
+  .contact-row .value {
+    font-size: 15px;
+  }
 }
 @media (max-width: 480px) {
   .header-sublabel { display: none !important; }
