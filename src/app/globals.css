@@ -243,12 +243,12 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Hero padding tightened to recover the /01 RESEARCH eyebrow peek
-       at the bottom of the fold after sections grew to 120px max
-       padding. The peek band needs hero to end ~40px before the fold,
-       which means hero (content + padding) must be ≤ 100svh - section-pad
-       - 40. */
-    padding: clamp(48px, 9vw, 80px) 0 clamp(24px, 5vw, 40px);
+    /* Hero top padding floor 96 / ceiling 120 — these *must* exceed the
+       fixed header's height (≈72px mobile, ≈85px desktop) so the status
+       pill doesn't sit behind the frosted glass on first paint. Below
+       96px the pill clipped on mobile; below 80px it clipped on desktop
+       where the header grew with the bigger inner padding-block. */
+    padding: clamp(96px, 12vw, 120px) 0 clamp(48px, 5vw, 56px);
     position: relative;
   }
   .status-pill {
@@ -333,7 +333,7 @@ footer {
      section content (mobile gap was reading too tight). Desktop ceiling
      unchanged because 10vw at 1440px = 144px which already clamps to the
      120 ceiling — only sub-720px viewports see the floor change. */
-  .section { padding: clamp(72px, 10vw, 120px) 0; position: relative; scroll-margin-top: 100px; }
+  .section { padding: clamp(96px, 10vw, 120px) 0; position: relative; scroll-margin-top: 100px; }
 
   .eyebrow {
     font-family: var(--font-mono);
@@ -368,7 +368,7 @@ footer {
   .body-stack strong { color: var(--text-primary); font-weight: 500; }
 
   /* Portfolio "door" — load-bearing interactive element. */
-  .door-section { padding: clamp(72px, 10vw, 120px) 0 clamp(96px, 12vw, 140px); scroll-margin-top: 100px; }
+  .door-section { padding: clamp(96px, 10vw, 120px) 0 clamp(112px, 12vw, 140px); scroll-margin-top: 100px; }
   .door-intro { max-width: 640px; margin-bottom: 56px; }
   .door-intro p { font-size: 17px; line-height: 1.65; color: var(--text-secondary); margin: 0 0 16px; }
   .door-intro p:last-child { margin: 0; }
@@ -573,7 +573,7 @@ footer {
      fluid to match the section rhythm; floor raised to 72 alongside the
      section padding bump so mobile gets matching breathing room. */
   .site-footer {
-    padding: clamp(72px, 10vw, 80px) 24px 60px;
+    padding: clamp(96px, 10vw, 96px) 24px 60px;
     text-align: center;
     border-top: 1px solid var(--divider);
     margin-top: 0;
