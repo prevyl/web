@@ -159,13 +159,13 @@ footer {
   .site-header-inner {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 18px clamp(16px, 4vw, 32px);
+    padding: 24px clamp(16px, 4vw, 32px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     /* Editorial header-shrink: as the page scrolls past 100px, the
-       header's vertical padding compresses 18→11px. Tiny but adds the
+       header's vertical padding compresses 24→16px. Adds the
        "this site cares" feeling. Chromium-only; everyone else gets the
        static header (no degradation). */
     transition: padding-block 200ms var(--ease-emph);
@@ -177,7 +177,7 @@ footer {
       animation-range: 0 100px;
     }
     @keyframes header-shrink {
-      to { padding-block: 11px; }
+      to { padding-block: 16px; }
     }
   }
   .brand {
@@ -243,7 +243,12 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(64px, 11vw, 96px) 0 clamp(40px, 7vw, 64px);
+    /* Hero padding tightened to recover the /01 RESEARCH eyebrow peek
+       at the bottom of the fold after sections grew to 120px max
+       padding. The peek band needs hero to end ~40px before the fold,
+       which means hero (content + padding) must be ≤ 100svh - section-pad
+       - 40. */
+    padding: clamp(48px, 9vw, 80px) 0 clamp(24px, 5vw, 40px);
     position: relative;
   }
   .status-pill {
@@ -323,10 +328,10 @@ footer {
 
   /* Sections — generic editorial section: vertical breathing room and a
      scroll-margin so hash-anchor jumps don't tuck under the fixed header.
-     Padding clamps from 96px (desktop) → 56px floor (≤560px viewports) so
-     mobile gets ~42% less dead space between sections without nuking the
-     editorial breath at desktop. */
-  .section { padding: clamp(56px, 10vw, 96px) 0; position: relative; scroll-margin-top: 100px; }
+     Padding clamps from 120px (desktop) → 56px floor (≤560px viewports);
+     desktop ceiling raised from 96 to 120 for more editorial breathing
+     room, mobile floor unchanged. */
+  .section { padding: clamp(56px, 10vw, 120px) 0; position: relative; scroll-margin-top: 100px; }
 
   .eyebrow {
     font-family: var(--font-mono);
@@ -361,7 +366,7 @@ footer {
   .body-stack strong { color: var(--text-primary); font-weight: 500; }
 
   /* Portfolio "door" — load-bearing interactive element. */
-  .door-section { padding: clamp(56px, 10vw, 96px) 0 clamp(72px, 12vw, 120px); scroll-margin-top: 100px; }
+  .door-section { padding: clamp(56px, 10vw, 120px) 0 clamp(72px, 12vw, 140px); scroll-margin-top: 100px; }
   .door-intro { max-width: 640px; margin-bottom: 56px; }
   .door-intro p { font-size: 17px; line-height: 1.65; color: var(--text-secondary); margin: 0 0 16px; }
   .door-intro p:last-child { margin: 0; }
@@ -618,8 +623,11 @@ footer {
 /* ── Mobile cascades ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .brand-sublabel { display: none; }
-  .nav { gap: 0; }
-  .nav-pill { padding: 6px 10px; font-size: 10px; letter-spacing: 0.12em; }
+  /* Hide in-page nav on mobile entirely. The page is 4 sections — visitors
+     scroll through naturally and the previous compressed pills (10px font,
+     6×10 padding) failed both WCAG tap-target minimums (44×44) and the
+     editorial breathing room. With nav gone the wordmark gets full room. */
+  .nav { display: none; }
   .door { padding: 40px 16px; }
   .door-arrow { width: 48px; height: 48px; }
 }
