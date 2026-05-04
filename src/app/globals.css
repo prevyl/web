@@ -328,10 +328,12 @@ footer {
 
   /* Sections — generic editorial section: vertical breathing room and a
      scroll-margin so hash-anchor jumps don't tuck under the fixed header.
-     Padding clamps from 120px (desktop) → 56px floor (≤560px viewports);
-     desktop ceiling raised from 96 to 120 for more editorial breathing
-     room, mobile floor unchanged. */
-  .section { padding: clamp(56px, 10vw, 120px) 0; position: relative; scroll-margin-top: 100px; }
+     Padding clamps 72px floor (mobile) → 120px ceiling (desktop). Floor
+     raised from 56 → 72 so mobile gets ~30% more space between adjacent
+     section content (mobile gap was reading too tight). Desktop ceiling
+     unchanged because 10vw at 1440px = 144px which already clamps to the
+     120 ceiling — only sub-720px viewports see the floor change. */
+  .section { padding: clamp(72px, 10vw, 120px) 0; position: relative; scroll-margin-top: 100px; }
 
   .eyebrow {
     font-family: var(--font-mono);
@@ -366,7 +368,7 @@ footer {
   .body-stack strong { color: var(--text-primary); font-weight: 500; }
 
   /* Portfolio "door" — load-bearing interactive element. */
-  .door-section { padding: clamp(56px, 10vw, 120px) 0 clamp(72px, 12vw, 140px); scroll-margin-top: 100px; }
+  .door-section { padding: clamp(72px, 10vw, 120px) 0 clamp(96px, 12vw, 140px); scroll-margin-top: 100px; }
   .door-intro { max-width: 640px; margin-bottom: 56px; }
   .door-intro p { font-size: 17px; line-height: 1.65; color: var(--text-secondary); margin: 0 0 16px; }
   .door-intro p:last-child { margin: 0; }
@@ -568,9 +570,10 @@ footer {
   /* Footer — margin-top dropped (was 80px) because the preceding section's
      bottom padding already supplies separation; stacking margin on top of
      that produced a 256px gap before the footer line. Padding-top stays
-     fluid to match the section rhythm. */
+     fluid to match the section rhythm; floor raised to 72 alongside the
+     section padding bump so mobile gets matching breathing room. */
   .site-footer {
-    padding: clamp(56px, 10vw, 80px) 24px 60px;
+    padding: clamp(72px, 10vw, 80px) 24px 60px;
     text-align: center;
     border-top: 1px solid var(--divider);
     margin-top: 0;
