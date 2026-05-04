@@ -1,13 +1,29 @@
-"use client";
+import type { CSSProperties } from "react";
 
-import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+/* All sections render as React Server Components — no `"use client"`,
+   no motion library. Entry animation is CSS keyframes + animation-delay,
+   scroll reveals use @supports (animation-timeline: view()), every hover
+   is pure CSS. The whole route prerenders to static HTML at build time. */
 
-const EASE_EMPH: [number, number, number, number] = [0.16, 1, 0.3, 1];
+function ArrowOutIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M7 17 17 7" />
+      <path d="M8 7h9v9" />
+    </svg>
+  );
+}
 
-/* Inline mail + LinkedIn icons. Keeps us off external icon libraries
-   (per prompt) while still giving the contact rows visual hierarchy. */
 function MailIcon() {
   return (
     <svg
@@ -41,86 +57,50 @@ function LinkedInIcon() {
   );
 }
 
+function PinIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2c-3.866 0-7 3.134-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export function Header() {
   return (
+    // Inline backdrop-filter — see globals.css `.site-header` for the rationale.
+    // Tailwind v4's Lightning CSS minifier was stripping the unprefixed
+    // declaration from the stylesheet, breaking the frosted-glass effect on
+    // modern Chromium. Inline style is immutable through the build pipeline.
     <header
+      className="site-header"
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        // Frosted-glass bar — at page-top the bg matches body so the
-        // header looks transparent; as content scrolls under, the alpha
-        // + backdrop-blur creates a legible separation without a hard
-        // line. Matches the Apple/Stripe/Linear header idiom.
-        background: "rgba(10, 10, 10, 0.72)",
         backdropFilter: "blur(16px) saturate(180%)",
         WebkitBackdropFilter: "blur(16px) saturate(180%)",
-        borderBottom: "1px solid var(--divider)",
       }}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "18px clamp(16px, 4vw, 32px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
-        <a
-          href="#top"
-          aria-label="prevyl — top"
-          style={{
-            display: "inline-flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: 4,
-            lineHeight: 1,
-            textDecoration: "none",
-            color: "var(--text-primary)",
-          }}
-        >
-          {/* Wordmark SVG is the full brand mark — lowercase prevyl with
-              amber y. No accompanying monogram; the wordmark carries the
-              name on its own. */}
-          {/* Wordmark SVG is 3.25:1 (viewBox 260×80). Declared at the
-              rendered aspect so Next.js reserves the exact space and
-              there's no CLS. */}
-          <Image
-            src="/assets/prevyl-wordmark-dark.svg"
-            alt="prevyl"
-            width={78}
-            height={24}
-            priority
-          />
-          <span
-            className="header-sublabel"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              letterSpacing: "0.2em",
-              color: "var(--text-muted)",
-              paddingLeft: 2,
-            }}
-          >
-            RESEARCH · BLR
+      <div className="site-header-inner">
+        {/* No aria-label here: the visible text "prevyl RESEARCH · BLR"
+            already serves as the accessible name. Adding aria-label that
+            doesn't start with the visible text fails axe rule
+            label-content-name-mismatch (WCAG SC 2.5.3). */}
+        <a href="#top" className="brand">
+          <span>
+            prev<span className="y">y</span>l
           </span>
+          <span className="brand-sublabel">RESEARCH · BLR</span>
         </a>
-
-        <nav
-          aria-label="Primary"
-          className="header-nav"
-          style={{ display: "flex", alignItems: "center", gap: 4 }}
-        >
-          <a href="#about" className="nav-pill">
-            <span className="num">/01</span> About
+        <nav className="nav" aria-label="Primary">
+          <a href="#research" className="nav-pill">
+            <span className="num">/01</span> Research
+          </a>
+          <a href="#work" className="nav-pill">
+            <span className="num">/02</span> Work
           </a>
           <a href="#contact" className="nav-pill">
-            <span className="num">/02</span> Contact
+            <span className="num">/03</span> Contact
           </a>
         </nav>
       </div>
@@ -129,325 +109,243 @@ export function Header() {
 }
 
 export function Hero() {
-  const reduce = useReducedMotion();
-  const child = reduce
-    ? {}
-    : {
-        initial: { opacity: 0, y: 10 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.5, ease: EASE_EMPH },
-      };
-
   return (
-    <section
-      id="top"
-      style={{
-        position: "relative",
-        minHeight: "90svh",
-        display: "flex",
-        alignItems: "center",
-        paddingTop: "max(7rem, 14vh)",
-        paddingBottom: "clamp(2rem, 8vh, 6rem)",
-        overflow: "hidden",
-      }}
-    >
-      <motion.div
-        initial={reduce ? undefined : "hidden"}
-        animate={reduce ? undefined : "visible"}
-        variants={
-          reduce
-            ? undefined
-            : {
-                hidden: {},
-                visible: { transition: { staggerChildren: 0.08 } },
-              }
-        }
-        style={{
-          position: "relative",
-          zIndex: 1,
-          width: "100%",
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 24px",
-        }}
-      >
-        <motion.span
-          className="availability-pill"
-          variants={
-            reduce
-              ? undefined
-              : {
-                  hidden: { opacity: 0, y: 10 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_EMPH } },
-                }
-          }
-        >
-          <span aria-hidden="true" className="dot" />
-          RESEARCH PHASE · BANGALORE
-        </motion.span>
-
-        <motion.h1
-          variants={
-            reduce
-              ? undefined
-              : {
-                  hidden: { opacity: 0, y: 12 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_EMPH } },
-                }
-          }
-          style={{
-            marginTop: 24,
-            fontSize: "var(--fluid-h1)",
-            fontWeight: 700,
-            lineHeight: 1.08,
-            letterSpacing: "-0.01em",
-            color: "var(--text-primary)",
-          }}
-        >
-          prev<span style={{ color: "var(--accent)" }}>y</span>l is a research
-          <br />
-          project, <em style={{ color: "var(--text-primary)" }}>not</em> a product.
-        </motion.h1>
-
-        <motion.p
-          variants={
-            reduce
-              ? undefined
-              : {
-                  hidden: { opacity: 0, y: 8 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_EMPH } },
-                }
-          }
-          style={{
-            marginTop: 24,
-            maxWidth: 640,
-            fontSize: 18,
-            lineHeight: 1.55,
-            color: "var(--text-secondary)",
-          }}
-        >
-          I&apos;m Aryan B V, talking to Indian SME exporters about what actually wastes their time —{" "}
-          <em style={{ color: "var(--text-primary)" }}>before</em> writing a single line of product code.
-        </motion.p>
-
-        <motion.div
-          {...child}
-          className="hero-cta-group"
-          style={{
-            marginTop: 36,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <a href="#about" className="btn-xl primary">
-            Read about me →
+    <section id="top" className="hero">
+      <div className="page-wrap col-720" style={{ width: "100%" }}>
+        <div className="hero-fade hero-fade-1">
+          <span className="status-pill">
+            <span className="status-dot" aria-hidden="true" />
+            <span>RESEARCH PHASE · BANGALORE</span>
+          </span>
+        </div>
+        <h1 className="hero-h1 hero-fade hero-fade-2">
+          I&apos;m researching what wastes Indian SME exporters&apos;{" "}
+          <em>time</em>.
+        </h1>
+        <p className="hero-sub hero-fade hero-fade-3">
+          Outside the research, I take on freelance and contract work — from
+          one-off integrations to end-to-end product builds. If you have an
+          idea you want tested before committing budget to a real build,
+          I&apos;ll do the research without a fee and tell you what&apos;s
+          possible. If a fix is buildable and we agree on scope, we discuss
+          price then.
+        </p>
+        <div className="hero-cta-row hero-fade hero-fade-4">
+          <a href="#contact" className="btn btn-primary">
+            Talk to me
+            <span className="arrow">
+              <ArrowOutIcon />
+            </span>
           </a>
-          <a href="#contact" className="btn-xl ghost">
-            Get in touch
+          <a
+            href="https://aryanbv.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-ghost"
+          >
+            See the work
+            <span className="arrow">
+              <ArrowOutIcon />
+            </span>
           </a>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function RevealBlock({ children }: { children: ReactNode }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <>{children}</>;
+export function Research() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: EASE_EMPH }}
-    >
-      {children}
-    </motion.div>
+    <section id="research" className="section">
+      <div className="page-wrap col-720">
+        <div className="eyebrow reveal">
+          <span className="num">/01</span>
+          <span>RESEARCH</span>
+        </div>
+        <h2 className="h2-tight reveal">What I&apos;m doing right now.</h2>
+        <div className="body-stack">
+          <p className="reveal">
+            I&apos;m <strong>Aryan B V</strong>, a full-stack engineer in
+            Bangalore with a B.Tech in AI/ML. I&apos;ve shipped a PDF editing
+            trilogy on PyPI and npm, and a PWA running daily at a family-owned
+            spare parts retailer in Karnataka.
+          </p>
+          <p className="reveal">
+            <strong>prevyl is a research project, not a product.</strong>{" "}
+            I&apos;m interviewing Indian SME exporters about what wastes their
+            time — the manual spreadsheet juggling, the chasing-payments loops,
+            the paperwork roundtrips with banks and customs — before writing a
+            single line of product code.
+          </p>
+          <p className="reveal">
+            No product yet. That comes after the interviews tell me what to
+            build.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
-export function About() {
+const DOOR_URL_CHARS = Array.from("aryanbv.com");
+
+export function Work() {
   return (
-    <section
-      id="about"
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "clamp(4rem, 10vh, 7rem) 24px",
-        scrollMarginTop: 88,
-      }}
-    >
-      <RevealBlock>
-        <div className="eyebrow" style={{ marginBottom: 20 }}>
-          <span className="num">/01</span>
-          <span>About</span>
+    <section id="work" className="section door-section">
+      <div className="page-wrap col-1100">
+        <div className="eyebrow reveal">
+          <span className="num">/02</span>
+          <span>WORK</span>
+        </div>
+        <h2 className="h2-tight reveal">Things I&apos;ve built live elsewhere.</h2>
+        <div className="door-intro reveal">
+          <p>
+            My shipped work lives at <strong>aryanbv.com</strong> — the PDF
+            editing trilogy (<strong>628 tests, 85% coverage</strong>, on PyPI
+            and npm), a PWA running daily at a family-owned spare parts
+            retailer, and a few others.
+          </p>
+          <p style={{ color: "var(--text-muted)" }}>
+            Source, case studies, and metrics — all there.
+          </p>
         </div>
 
-        <h2
-          style={{
-            marginBottom: 32,
-            fontSize: "var(--fluid-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.005em",
-            color: "var(--text-primary)",
-          }}
+        {/* No aria-label here: the visible content (eyebrow, URL, meta) is
+            the accessible name for screen readers. The previous
+            "Visit aryanbv.com..." aria-label failed axe rule
+            label-content-name-mismatch because visible text didn't begin
+            with "Visit". Screen readers will read the full content, which
+            is informative — and `target="_blank"` triggers the standard
+            "opens in a new tab" announcement automatically. */}
+        <a
+          href="https://aryanbv.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="door"
         >
-          Who I am.
-        </h2>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 20,
-            fontSize: 17,
-            lineHeight: 1.65,
-            color: "var(--text-secondary)",
-          }}
-        >
-          <p>
-            I&apos;m Aryan B V. Full-stack engineer, B.Tech in AI/ML from Ramaiah University of Applied Sciences (2021–25). Based in Bangalore.
-          </p>
-          <p>
-            Before prevyl, I built{" "}
-            <a
-              href="https://aryanbv.com/projects/ajsp-manager"
-              className="text-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              AJSP Manager
-            </a>{" "}
-            — a PWA running daily at my family&apos;s automotive spare parts shop in Karnataka, replacing a 15-year Excel workflow. I&apos;ve also shipped a trilogy of PDF tooling to PyPI, npm, and the MCP Registry. My full portfolio is at{" "}
-            <a
-              href="https://aryanbv.com"
-              className="text-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              aryanbv.com
-            </a>
-            .
-          </p>
-          <p>
-            prevyl is my current focus. I&apos;m in the research phase — interviewing Indian SME exporters to understand their real workflow. No product yet. That comes after the interviews tell me what to build.
-          </p>
-        </div>
-      </RevealBlock>
+          <div className="door-eyebrow">
+            <span style={{ marginRight: 14 }}>PORTFOLIO ↗</span>
+            <span style={{ color: "var(--text-muted)" }}>OPENS IN NEW TAB</span>
+          </div>
+          <div className="door-row">
+            <span className="door-url">
+              {DOOR_URL_CHARS.map((ch, i) => (
+                <span
+                  key={i}
+                  className="ch"
+                  style={{ "--i": i } as CSSProperties}
+                >
+                  {ch}
+                </span>
+              ))}
+            </span>
+            <span className="door-arrow" aria-hidden="true">
+              <ArrowOutIcon size={22} />
+            </span>
+          </div>
+          <div className="door-meta">
+            <div className="door-meta-item">
+              <span className="door-meta-label">PROJECTS</span>
+              <span className="door-meta-value">6 shipped</span>
+            </div>
+            <div className="door-meta-item">
+              <span className="door-meta-label">PACKAGES</span>
+              <span className="door-meta-value">PyPI · npm</span>
+            </div>
+            <div className="door-meta-item">
+              <span className="door-meta-label">COVERAGE</span>
+              <span className="door-meta-value">
+                <span className="accent">85%</span> · 628 tests
+              </span>
+            </div>
+            <div className="door-meta-item">
+              <span className="door-meta-label">UPDATED</span>
+              <span className="door-meta-value">Weekly</span>
+            </div>
+          </div>
+        </a>
+      </div>
     </section>
   );
 }
 
 export function Contact() {
   return (
-    <section
-      id="contact"
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "clamp(4rem, 10vh, 7rem) 24px",
-        scrollMarginTop: 88,
-      }}
-    >
-      <RevealBlock>
-        <div className="eyebrow" style={{ marginBottom: 20 }}>
-          <span className="num">/02</span>
-          <span>Contact</span>
+    <section id="contact" className="section">
+      <div className="page-wrap col-720">
+        <div className="eyebrow reveal">
+          <span className="num">/03</span>
+          <span>CONTACT</span>
+        </div>
+        <h2 className="h2-tight reveal">Talk to me.</h2>
+        <div className="body-stack reveal">
+          <p>
+            If you export from India and have <strong>20 minutes</strong>,
+            I&apos;d like to hear how you actually work. In person if
+            you&apos;re in Bangalore, a call if you&apos;re elsewhere. No
+            pitch, no signup, no list.
+          </p>
         </div>
 
-        <h2
-          style={{
-            marginBottom: 32,
-            fontSize: "var(--fluid-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.005em",
-            color: "var(--text-primary)",
-          }}
-        >
-          Talk to me.
-        </h2>
+        <div className="aside-block reveal">
+          <div className="aside-eyebrow">One more thing.</div>
+          <p>
+            In the meantime, I take on technical work — web apps, MCP servers,
+            Python tooling, AI integrations. Bring me an idea you want tested
+            before you commit budget to building it, and I&apos;ll do the
+            research without a fee.
+          </p>
+        </div>
 
-        <p
-          style={{
-            marginBottom: 32,
-            fontSize: 17,
-            lineHeight: 1.65,
-            color: "var(--text-secondary)",
-          }}
-        >
-          If you export from India and have 20 minutes, I&apos;d like to hear how you work. In person if you&apos;re in Bangalore, a call if you&apos;re elsewhere.
-        </p>
-
-        <div role="list" style={{ borderTop: "1px solid var(--divider)", marginBottom: 36 }}>
-          <a href="mailto:aryan@prevyl.com" className="contact-row" role="listitem">
-            <span className="icon" aria-hidden="true">
+        <div className="contact-list reveal">
+          <a href="mailto:aryan@prevyl.com" className="contact-row">
+            <span className="icon">
               <MailIcon />
             </span>
-            <span className="label">Email</span>
+            <span className="label">EMAIL</span>
             <span className="value">aryan@prevyl.com</span>
-            <span className="arrow" aria-hidden="true">↗</span>
+            <span className="arrow">
+              <ArrowOutIcon size={14} />
+            </span>
           </a>
           <a
-            href="https://www.linkedin.com/in/aryanbv/"
-            className="contact-row"
-            role="listitem"
+            href="https://www.linkedin.com/in/aryan-b-v-78aa63246/"
             target="_blank"
             rel="noopener noreferrer"
+            className="contact-row"
           >
-            <span className="icon" aria-hidden="true">
+            <span className="icon">
               <LinkedInIcon />
             </span>
-            <span className="label">LinkedIn</span>
-            <span className="value">/in/aryanbv</span>
-            <span className="arrow" aria-hidden="true">↗</span>
+            <span className="label">LINKEDIN</span>
+            <span className="value">/in/aryan-b-v</span>
+            <span className="arrow">
+              <ArrowOutIcon size={14} />
+            </span>
           </a>
         </div>
 
         <span className="location-pill">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M12 2c-3.866 0-7 3.134-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
-              fill="currentColor"
-            />
-          </svg>
-          Bangalore, IN
+          <PinIcon />
+          <span>BANGALORE, IN</span>
         </span>
-      </RevealBlock>
+      </div>
     </section>
-  );
-}
-
-export function SectionDivider() {
-  return (
-    <div
-      aria-hidden="true"
-      className="section-divider"
-      style={{ marginTop: 16, marginBottom: 16 }}
-    />
   );
 }
 
 export function Footer() {
   return (
-    <footer style={{ padding: "56px 24px 40px", textAlign: "center" }}>
-      <p
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          letterSpacing: "0.15em",
-          color: "var(--text-muted)",
-        }}
-      >
-        prevyl · Built by Aryan B V · Last updated April 2026
+    <footer className="site-footer">
+      <p>
+        prevyl · Built by Aryan B V · See more at{" "}
+        <a
+          href="https://aryanbv.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          aryanbv.com
+        </a>
       </p>
     </footer>
   );

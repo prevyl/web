@@ -7,7 +7,8 @@ import { ImageResponse } from "next/og";
 // JSX so we get a real PNG that LinkedIn / WhatsApp / Twitter actually
 // render in their link previews (SVG og:image is not supported by most).
 
-export const alt = "prevyl — Export infrastructure for Indian SMEs";
+export const alt =
+  "prevyl — Researching what wastes Indian SME exporters' time. By Aryan B V.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -26,7 +27,7 @@ async function loadGoogleFont(family: string, weight: number, text: string) {
 
 export default async function OG() {
   // Every unique character in the card — tells Google to send only those glyphs.
-  const text = "prevylcomExportinfrastructurefoIndianSMEs. ";
+  const text = "prevyl.com Researching what wastes Indian SME exporters' time.·";
   const [geistRegular, geistMedium] = await Promise.all([
     loadGoogleFont("Geist", 400, text),
     loadGoogleFont("Geist", 500, text),
@@ -101,16 +102,20 @@ export default async function OG() {
           <span>l</span>
         </div>
 
-        {/* Tagline */}
+        {/* Tagline — matches the page's research thesis verbatim. Don't
+            paraphrase: the OG card is the first thing seen on social
+            shares, and any drift from the page copy reads as bait-and-switch. */}
         <div
           style={{
             marginTop: 36,
             color: "#a09888",
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: 400,
+            textAlign: "center",
+            maxWidth: 980,
           }}
         >
-          Export infrastructure for Indian SMEs
+          Researching what wastes Indian SME exporters&apos; time.
         </div>
       </div>
     ),

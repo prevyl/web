@@ -1,11 +1,4 @@
-import {
-  About,
-  Contact,
-  Footer,
-  Header,
-  Hero,
-  SectionDivider,
-} from "./_components";
+import { Contact, Footer, Header, Hero, Research, Work } from "./_components";
 
 export default function Home() {
   return (
@@ -13,9 +6,8 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <SectionDivider />
-        <About />
-        <SectionDivider />
+        <Research />
+        <Work />
         <Contact />
       </main>
       <Footer />

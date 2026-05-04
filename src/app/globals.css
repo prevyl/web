@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 /* Design tokens — verbatim from live aryanbv.com (verified via CSS custom
-   properties on the deployed site). Do not modify values, round, or
-   "improve". The two font tokens prepend the Vercel `geist` package's
-   next/font CSS vars so the actually-loaded font resolves before the
-   literal "Geist" / "Geist Mono" family-name fallback. */
+   properties on the deployed site) and the Variant A handoff bundle. The
+   two font tokens prepend the Vercel `geist` package's next/font CSS vars
+   so the actually-loaded font resolves before the literal "Geist" /
+   "Geist Mono" family-name fallback. */
 @theme {
   --bg-base: #0a0a0a;
   --bg-surface: #111;
@@ -15,8 +15,8 @@
   /* Prompt token was #787068 (verbatim from aryanbv.com), which hits only
      4.07:1 on #0a0a0a — below WCAG AA 4.5:1 for small text (all our uses
      of this token are 10–13px). Lightened to #887c6e (~4.83:1) to clear AA
-     without losing the warm-taupe character. Single deliberate divergence
-     from aryanbv.com tokens, flagged to Aryan. */
+     without losing the warm-taupe character. The Variant A handoff also
+     ships #887c6e, so we're aligned. */
   --text-muted: #887c6e;
   --accent: #f5a623;
   --accent-2: #ff6b35;
@@ -37,6 +37,15 @@
   --fluid-h2: clamp(1.75rem, 3.6vw, 3rem);
   --ease-emph: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 200ms;
+  --dur-base: 250ms;
+  --dur-slow: 350ms;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+  --content-width: 720px;
+  --max-width: 1200px;
   --font-display: var(--font-geist-sans), "Geist", sans-serif;
   --font-mono: var(--font-geist-mono), "Geist Mono", monospace;
 }
@@ -60,27 +69,32 @@ video {
   max-width: 100%;
 }
 
-/* Near-invisible paper grain — 1% opacity, just enough to take the
-   digital flatness off the dark surface without recalling the portfolio's
-   heavier texture layer. */
+/* Page-grain — fixed full-viewport SVG noise overlay. Sits at z-index 1
+   (above body bg, below content); mix-blend-mode: screen lightens the
+   body background through transparent regions, giving the editorial film
+   effect. Load-bearing per the design handoff — do not soften further. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
-  opacity: 0.01;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/></svg>");
   background-repeat: repeat;
-  background-size: 128px 128px;
+  background-size: 160px 160px;
 }
 
-/* Page content stacks above the grain layer. */
-header,
+/* Page content stacks above the grain layer. The site header is excluded
+   here because `.site-header` already declares `position: fixed; z-index: 50`
+   inside @layer components — and unlayered rules win over @layer rules
+   regardless of specificity, which would silently demote the header back
+   to position:relative and cause it to scroll away with the page. */
 main,
 footer {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 ::selection {
@@ -116,233 +130,510 @@ footer {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+  /* The global rule above clamps duration but not delay. The door's
+     per-character cascade uses `transition-delay: calc(var(--i) * 18ms)`,
+     which would still fire as a sequence of instant snaps spaced 18ms
+     apart. Resetting transition-delay collapses the wave to a single
+     simultaneous change. */
+  .door-url .ch { transition-delay: 0s !important; }
 }
 
-/* ── Component primitives (btn-xl, pill, card, eyebrow) ───────────── */
+/* ── Component primitives ───────────────────────────────────────────── */
 @layer components {
-  .btn-xl {
+  /* Header — backdrop-filter lives on the JSX inline style, NOT here.
+     Lightning CSS (Tailwind v4 minifier) was deduping the prefixed +
+     unprefixed `backdrop-filter` declarations and outputting ONLY the
+     `-webkit-` form, which modern Chromium doesn't support, so the
+     frosted-glass effect was silently broken. Inline JSX styles bypass
+     the CSS pipeline entirely and ship both prefixed + unprefixed to
+     the browser intact. See _components.tsx Header. */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(10, 10, 10, 0.72);
+    border-bottom: 1px solid var(--divider);
+  }
+  .site-header-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 18px clamp(16px, 4vw, 32px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    /* Editorial header-shrink: as the page scrolls past 100px, the
+       header's vertical padding compresses 18→11px. Tiny but adds the
+       "this site cares" feeling. Chromium-only; everyone else gets the
+       static header (no degradation). */
+    transition: padding-block 200ms var(--ease-emph);
+  }
+  @supports (animation-timeline: scroll()) {
+    .site-header-inner {
+      animation: header-shrink linear both;
+      animation-timeline: scroll();
+      animation-range: 0 100px;
+    }
+    @keyframes header-shrink {
+      to { padding-block: 11px; }
+    }
+  }
+  .brand {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .brand .y { color: var(--accent); }
+  .brand-sublabel {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    padding-left: 2px;
+  }
+
+  .nav { display: flex; align-items: center; gap: 4px; }
+  .nav-pill {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    transition: background var(--dur-base) var(--ease-emph), color var(--dur-base) var(--ease-emph);
+  }
+  .nav-pill:hover { background: var(--accent-dim); color: var(--text-primary); }
+  .nav-pill .num { color: var(--text-muted); margin-right: 4px; }
+  .nav-pill:hover .num { color: var(--accent); }
+
+  /* Layout containers */
+  .page-wrap {
     position: relative;
+    z-index: 2;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 48px);
+  }
+  .col-720 { max-width: var(--content-width); }
+  .col-1100 { max-width: 1100px; }
+
+  /* Hero — sized so the /01 RESEARCH eyebrow visibly peeks at the bottom
+     of the fold on common laptop viewports (900–1080px tall). The
+     `calc(100svh - 160px)` leaves a band big enough to clear the next
+     section's 96px top padding plus ~40px of eyebrow line — the brain
+     reads "/01 RESEARCH" and the page invites the scroll. `100svh`
+     (small viewport height) so the URL bar's collapsed-extra space
+     doesn't get counted on mobile. Padding tightened from the design
+     defaults so the hero stays inside the peek envelope across viewports
+     without sacrificing the editorial breathing-room feel. */
+  .hero {
+    min-height: calc(100svh - 160px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(64px, 11vw, 96px) 0 clamp(40px, 7vw, 64px);
+    position: relative;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    width: fit-content;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--accent);
+    animation: pulse 1.6s var(--ease-emph) infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 #f5a62366; }
+    70%  { box-shadow: 0 0 0 8px #f5a62300; }
+    100% { box-shadow: 0 0 0 0 #f5a62300; }
+  }
+
+  /* Hero h1 — surface-specific clamp (bigger than the global --fluid-h1
+     token, which other surfaces still use). */
+  .hero-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.018em;
+    color: var(--text-primary);
+    margin: 28px 0 0;
+    text-wrap: balance;
+  }
+  .hero-h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    margin: 28px 0 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    text-wrap: pretty;
+    max-width: 60ch;
+  }
+  .hero-cta-row { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 12px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 14px 22px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--dur-base) var(--ease-emph);
+  }
+  .btn-primary { background: var(--text-primary); color: var(--bg-base); }
+  .btn-primary:hover { background: var(--accent); box-shadow: var(--accent-glow); }
+  .btn-ghost { background: transparent; color: var(--text-primary); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--border-hover); background: var(--bg-surface); color: var(--accent); }
+  .btn .arrow { transition: transform var(--dur-base) var(--ease-emph); display: inline-flex; }
+  .btn:hover .arrow { transform: translate(2px, -2px); }
+
+  /* Sections — generic editorial section: vertical breathing room and a
+     scroll-margin so hash-anchor jumps don't tuck under the fixed header.
+     Padding clamps from 96px (desktop) → 56px floor (≤560px viewports) so
+     mobile gets ~42% less dead space between sections without nuking the
+     editorial breath at desktop. */
+  .section { padding: clamp(56px, 10vw, 96px) 0; position: relative; scroll-margin-top: 100px; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .eyebrow .num { color: var(--accent); margin-right: 12px; }
+
+  /* Section h2 — surface-specific clamp (slightly different than
+     --fluid-h2 globally). */
+  .h2-tight {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 3.6vw, 2.85rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.012em;
+    color: var(--text-primary);
+    margin: 0 0 32px;
+    text-wrap: balance;
+  }
+  .body-stack > p {
+    margin: 0 0 20px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    text-wrap: pretty;
+  }
+  .body-stack > p:last-child { margin-bottom: 0; }
+  .body-stack strong { color: var(--text-primary); font-weight: 500; }
+
+  /* Portfolio "door" — load-bearing interactive element. */
+  .door-section { padding: clamp(56px, 10vw, 96px) 0 clamp(72px, 12vw, 120px); scroll-margin-top: 100px; }
+  .door-intro { max-width: 640px; margin-bottom: 56px; }
+  .door-intro p { font-size: 17px; line-height: 1.65; color: var(--text-secondary); margin: 0 0 16px; }
+  .door-intro p:last-child { margin: 0; }
+  .door-intro strong { color: var(--text-primary); font-weight: 500; }
+
+  .door {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    color: var(--text-primary);
+    /* Internal horizontal padding insets content from the wash gradient
+       edges — editorial magazine convention. The wash (`.door::before`
+       at inset: 0) still bleeds edge-to-edge of the door box; only the
+       foreground content (eyebrow, URL, meta, arrow) shifts inward. */
+    padding: 56px clamp(16px, 2.5vw, 32px);
+    border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider);
+    transition: background var(--dur-slow) var(--ease-emph), border-color var(--dur-slow) var(--ease-emph);
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .door::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, var(--accent-wash));
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-emph);
+    z-index: -1;
+  }
+  .door:hover { border-color: var(--border-hover); }
+  .door:hover::before { opacity: 1; }
+
+  .door-row { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .door-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+  .door:hover .door-eyebrow { color: var(--accent); }
+
+  /* Door URL — each character is its own .ch span with --i:N for the
+     staggered amber-fill on hover. transition-delay scales by --i so the
+     amber + Y-translate cascade across the URL. Load-bearing detail:
+     don't shortcut to a single span. */
+  .door-url {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    display: inline-flex;
+    flex-wrap: wrap;
+  }
+  .door-url .ch {
+    display: inline-block;
+    transition: color var(--dur-base) var(--ease-emph), transform var(--dur-base) var(--ease-emph);
+    transition-delay: calc(var(--i, 0) * 18ms);
+  }
+  .door:hover .door-url .ch { color: var(--accent); transform: translateY(-2px); }
+
+  .door-arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 24px;
-    min-height: 44px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    flex-shrink: 0;
+    transition: all var(--dur-slow) var(--ease-emph);
+  }
+  .door:hover .door-arrow {
+    background: var(--accent);
+    color: var(--bg-base);
+    border-color: var(--accent);
+    transform: translate(4px, -4px) rotate(8deg);
+  }
+
+  .door-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 36px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--divider);
+  }
+  .door-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .door-meta-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .door-meta-value {
     font-family: var(--font-display);
     font-size: 15px;
     font-weight: 500;
-    line-height: 1;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      transform 250ms var(--ease-emph),
-      box-shadow 250ms var(--ease-emph),
-      border-color 250ms var(--ease-emph),
-      color 250ms var(--ease-emph);
-  }
-  .btn-xl.primary {
-    background: var(--accent);
-    color: var(--bg-base);
-  }
-  .btn-xl.primary:hover {
-    background: #ffb431;
-  }
-  .btn-xl.ghost {
-    background: transparent;
     color: var(--text-primary);
-    border-color: var(--border);
   }
-  .btn-xl.ghost:hover {
-    border-color: var(--text-secondary);
-    color: var(--text-primary);
-    background: var(--bg-surface);
-  }
+  .door-meta-value .accent { color: var(--accent); }
 
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .eyebrow .num {
-    color: var(--text-muted);
-    opacity: 0.75;
-  }
-
-  /* Editorial dateline — thin rule on the left, steady dot (no pulse),
-     mono meta text. Signals "dispatch from" rather than "live status." */
-  .availability-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .availability-pill::before {
-    content: "";
-    width: 32px;
-    height: 1px;
-    background: var(--text-muted);
-    opacity: 0.5;
-  }
-  .availability-pill .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--status-live);
-  }
-
-  .nav-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--text-muted);
-    text-decoration: none;
-    border-radius: 999px;
-    transition:
-      color 200ms var(--ease-emph),
-      background-color 200ms var(--ease-emph);
-  }
-  .nav-pill:hover {
-    color: var(--text-primary);
-    background: var(--accent-dim);
-  }
-  .nav-pill .num {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-  }
-  .nav-pill:hover .num {
-    color: var(--accent);
-  }
-
-  /* Contact row — editorial list entry with icon, label, value, arrow.
-     Deliberately NOT a card (Prevyl is a dispatch, not a product page). */
+  /* Contact list */
+  .contact-list { margin: 32px 0 0; border-top: 1px solid var(--divider); }
   .contact-row {
-    display: grid;
-    grid-template-columns: 18px 90px 1fr auto;
-    gap: 16px;
+    display: flex;
     align-items: center;
+    gap: 20px;
     padding: 20px 4px;
     border-bottom: 1px solid var(--divider);
-    color: var(--text-primary);
     text-decoration: none;
-    transition: color 250ms var(--ease-emph), border-color 250ms var(--ease-emph);
+    color: var(--text-primary);
+    transition: padding var(--dur-base) var(--ease-emph), background var(--dur-base) var(--ease-emph);
   }
   .contact-row:hover {
-    color: var(--accent);
-    border-bottom-color: var(--border-hover);
+    padding-left: 12px;
+    background: linear-gradient(90deg, var(--accent-wash), transparent 60%);
+  }
+  .contact-row .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    width: 100px;
+  }
+  .contact-row .value {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    flex: 1;
   }
   .contact-row .icon {
     display: inline-flex;
     color: var(--text-muted);
-    transition: color 250ms var(--ease-emph);
+    transition: color var(--dur-base) var(--ease-emph);
   }
-  .contact-row:hover .icon {
-    color: var(--accent);
-  }
-  .contact-row .label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .contact-row .value {
-    font-size: 17px;
-    color: inherit;
-  }
+  .contact-row:hover .icon { color: var(--accent); }
   .contact-row .arrow {
-    font-family: var(--font-mono);
+    display: inline-flex;
     color: var(--text-muted);
-    transition: transform 250ms var(--ease-emph), color 250ms var(--ease-emph);
+    margin-left: auto;
+    transition: transform var(--dur-base) var(--ease-emph), color var(--dur-base) var(--ease-emph);
   }
-  .contact-row:hover .arrow {
-    color: var(--accent);
-    transform: translate(4px, -2px);
-  }
+  .contact-row:hover .arrow { color: var(--accent); transform: translate(3px, -3px); }
 
   .location-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    margin-top: 32px;
     padding: 8px 14px;
     background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
+  .location-pill svg { color: var(--accent); }
 
-  /* Magnetic link — underline sweeps right-to-left on hover, arrow nudges
-     up-right if followed by an .arrow element. Mirrors portfolio pattern. */
-  .text-link {
-    position: relative;
-    display: inline-flex;
-    align-items: baseline;
+  /* "One more thing" aside — intentionally subordinate. */
+  .aside-block {
+    margin-top: 56px;
+    padding: 32px 0;
+    border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider);
+  }
+  .aside-eyebrow {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
     color: var(--text-primary);
-    text-decoration: none;
-    transition: color 250ms var(--ease-emph);
+    letter-spacing: -0.005em;
+    margin-bottom: 12px;
   }
-  .text-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px;
-    height: 1px;
-    background: currentColor;
-    transform-origin: right;
-    transform: scaleX(1);
-    opacity: 0.35;
-    transition:
-      transform 350ms var(--ease-emph),
-      opacity 250ms var(--ease-emph),
-      background 250ms var(--ease-emph);
-  }
-  .text-link:hover {
+  .aside-eyebrow::before {
+    content: "↳";
     color: var(--accent);
+    margin-right: 10px;
+    font-family: var(--font-mono);
   }
-  .text-link:hover::after {
-    opacity: 1;
+  .aside-block p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    text-wrap: pretty;
   }
+  .aside-block strong { color: var(--text-primary); font-weight: 500; }
 
-  /* Section divider — a single hairline rule, offset slightly from the
-     content width so it reads as structural instead of decorative. */
-  .section-divider {
-    height: 1px;
-    background: var(--divider);
-    max-width: 720px;
-    margin: 0 auto;
+  /* Footer — margin-top dropped (was 80px) because the preceding section's
+     bottom padding already supplies separation; stacking margin on top of
+     that produced a 256px gap before the footer line. Padding-top stays
+     fluid to match the section rhythm. */
+  .site-footer {
+    padding: clamp(56px, 10vw, 80px) 24px 60px;
+    text-align: center;
+    border-top: 1px solid var(--divider);
+    margin-top: 0;
+  }
+  .site-footer p {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+  }
+  .site-footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--divider);
+    transition: color var(--dur-base) var(--ease-emph), border-color var(--dur-base) var(--ease-emph);
+  }
+  .site-footer a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Hero entry — staggered fade-up on first paint. */
+  .hero-fade { opacity: 0; transform: translateY(14px); animation: fadeUp 720ms var(--ease-emph) forwards; }
+  .hero-fade-1 { animation-delay: 80ms; }
+  .hero-fade-2 { animation-delay: 200ms; }
+  .hero-fade-3 { animation-delay: 340ms; }
+  .hero-fade-4 { animation-delay: 480ms; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* Scroll-driven reveals — Chromium only. Firefox/Safari see content at
+     rest, which is the intended graceful degradation.
+     IMPORTANT: keyframes are *transform-only* (no opacity transition).
+     Earlier versions used `from { opacity: 0 }` which made elements below
+     the fold render at opacity 0 with `animation-fill-mode: both` — that
+     fails axe color-contrast checks (Lighthouse scored amber `/01` text
+     at 1.5:1 because it was being drawn at near-zero alpha). The
+     transform-only reveal keeps the editorial slide-up without ever
+     dimming the type below readable contrast. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 28%;
+    }
+    @keyframes reveal-up {
+      from { transform: translateY(20px); }
+      to   { transform: translateY(0); }
+    }
   }
 }
 
-/* ── Mobile-specific collapses ────────────────────────────────────── */
+/* ── Mobile cascades ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .header-nav { display: none !important; }
-  .hero-cta-group { flex-direction: column !important; align-items: stretch !important; }
-  .hero-cta-group .btn-xl { width: 100%; }
-  .contact-row {
-    grid-template-columns: 16px 72px 1fr auto;
-    gap: 12px;
-  }
-  .contact-row .value {
-    font-size: 15px;
-  }
+  .brand-sublabel { display: none; }
+  .nav { gap: 0; }
+  .nav-pill { padding: 6px 10px; font-size: 10px; letter-spacing: 0.12em; }
+  .door { padding: 40px 16px; }
+  .door-arrow { width: 48px; height: 48px; }
 }
+
+/* On very narrow phones the hero's two CTAs would otherwise flex-wrap mid-
+   row (around 390px viewport), leaving a stranded second button. Stack
+   them full-width below 480px. */
 @media (max-width: 480px) {
-  .header-sublabel { display: none !important; }
+  .hero-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-cta-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

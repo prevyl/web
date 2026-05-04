@@ -35,3 +35,5 @@ yarn-error.log*
 
 # local agent config (task spec, slash commands — not for public repo)
 .claude/
+# session audit artifacts (lighthouse screenshots etc.) — local only
+.claude-audit/
